@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="BusinessLogic/BusinessLogic.csproj" />
+  <Project Path="BusinessLogicTest/BusinessLogicTest.csproj" />
+  <Project Path="Data/Data.csproj" />
+  <Project Path="DataTest/DataTest.csproj" />
+  <Project Path="PresentationModel/PresentationModel.csproj" />
+  <Project Path="PresentationView/PresentationView.csproj" />
+  <Project Path="PresentationViewModel/PresentationViewModel.csproj" />
+  <Project Path="PresentationViewModelTest/PresentationViewModelTest.csproj" Id="83160bd0-f03a-42c2-81cb-66ad5ce0699a" />
+</Solution>
