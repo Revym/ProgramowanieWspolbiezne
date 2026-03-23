@@ -19,7 +19,7 @@ namespace PresentationModel
 
         public override void Start(int ballsCount)
         {
-            _logicApi.CreateBalls(ballsCount, 600, 400); // 600x400 to przykładowy rozmiar stołu
+            _logicApi.CreateBalls(ballsCount, 600, 400); 
             Balls.Clear();
             foreach (var ball in _logicApi.GetBalls())
             {
