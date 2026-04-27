@@ -33,6 +33,28 @@ namespace PresentationViewModel
 
         public double Scale => Math.Min(ActualWidth / LogicalWidth, ActualHeight / LogicalHeight);
 
+        public MainViewModel() : this(ModelAbstractApi.CreateApi()) {}
+
+        public MainViewModel(ModelAbstractApi model)
+        {
+            _model = model;
+
+            _model.ModelUpdated += (sender, statuses) =>
+            {
+                if (System.Windows.Application.Current != null)
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => UpdateBallsList(statuses));
+                }
+                else
+                {
+                    UpdateBallsList(statuses);
+                }
+            };
+
+            StartCommand = new RelayCommand(Start);
+            StopCommand = new RelayCommand(Stop);
+        }
+
         private void UpdateBallScaling()
         {
             foreach (var ball in Balls)
@@ -58,22 +80,6 @@ namespace PresentationViewModel
 
         public ICommand StartCommand { get; }
         public ICommand StopCommand { get; }
-
-        public MainViewModel()
-        {
-            _model = ModelAbstractApi.CreateApi();
-
-            _model.ModelUpdated += (sender, statuses) =>
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    UpdateBallsList(statuses);
-                });
-            };
-
-            StartCommand = new RelayCommand(Start);
-            StopCommand = new RelayCommand(Stop);
-        }
 
 
         private void UpdateBallsList(IEnumerable<IBallStatus> statuses)
@@ -120,5 +126,6 @@ namespace PresentationViewModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }
