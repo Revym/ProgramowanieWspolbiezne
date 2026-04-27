@@ -17,7 +17,6 @@ namespace BusinessLogicTest
             _balls.Clear();
             for (int i = 0; i < count; i++)
             {
-                // Tworzymy sztuczną kulę w bezpiecznym miejscu planszy
                 _balls.Add(new FakeBall(100.0, 100.0));
             }
         }

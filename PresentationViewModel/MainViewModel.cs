@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using BusinessLogic;
+using Data;
 using PresentationModel;
 using System;
 using System.Collections.Generic;
@@ -62,8 +63,38 @@ namespace PresentationViewModel
         {
             _model = ModelAbstractApi.CreateApi();
 
+            _model.ModelUpdated += (sender, statuses) =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UpdateBallsList(statuses);
+                });
+            };
+
             StartCommand = new RelayCommand(Start);
             StopCommand = new RelayCommand(Stop);
+        }
+
+        private void UpdateBallsList(IEnumerable<IBallStatus> statuses)
+        {
+            var statusList = new List<IBallStatus>(statuses);
+
+            if (Balls.Count != statusList.Count)
+            {
+                Balls.Clear();
+                foreach (var status in statusList)
+                {
+                    Balls.Add(new BallVM { X = status.X, Y = status.Y, Radius = status.Radius, Scale = this.Scale });
+                }
+            }
+            else
+            {
+                for (int i = 0; i < statusList.Count; i++)
+                {
+                    Balls[i].X = statusList[i].X;
+                    Balls[i].Y = statusList[i].Y;
+                }
+            }
         }
 
         private void Start()
@@ -71,19 +102,10 @@ namespace PresentationViewModel
             if (int.TryParse(BallsCountText, out int count) && count > 0)
             {
                 Stop();
-                _model.Start(count);
 
-                foreach (var oldBall in Balls)
-                {
-                    oldBall.Dispose();
-                }
                 Balls.Clear();
 
-                foreach (var ball in _model.Balls)
-                {
-                    Balls.Add(new BallVM(ball));
-                }
-                UpdateBallScaling();
+                _model.Start(count);
             }
         }
 

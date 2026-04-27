@@ -1,30 +1,24 @@
 ﻿using BusinessLogic;
-using Data;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 
 namespace PresentationModel
 {
     internal class ModelApi : ModelAbstractApi
     {
         private readonly LogicAbstractApi _logicApi;
-        public override ObservableCollection<IBall> Balls { get; } = new ObservableCollection<IBall>();
+
+        public override event EventHandler<IEnumerable<IBallStatus>>? ModelUpdated;
 
         public ModelApi()
         {
             _logicApi = LogicAbstractApi.CreateApi();
+            _logicApi.SimulationUpdated += (sender, args) => ModelUpdated?.Invoke(this, args);
         }
 
         public override void Start(int ballsCount)
         {
-            _logicApi.CreateBalls(ballsCount, 600, 400); 
-            Balls.Clear();
-            foreach (var ball in _logicApi.GetBalls())
-            {
-                Balls.Add(ball);
-            }
+            _logicApi.CreateBalls(ballsCount, 600, 400);
             _logicApi.StartSimulation();
         }
 

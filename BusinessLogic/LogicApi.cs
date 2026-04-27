@@ -1,7 +1,7 @@
 ﻿using Data;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Timers;
 
 namespace BusinessLogic
@@ -9,10 +9,10 @@ namespace BusinessLogic
     internal class LogicApi : LogicAbstractApi
     {
         private readonly DataAbstractApi _dataApi;
-
         private System.Timers.Timer? _timer;
-
         private readonly Random _random = new Random();
+
+        public override event EventHandler<IEnumerable<IBallStatus>>? SimulationUpdated;
 
         public LogicApi(DataAbstractApi dataApi)
         {
@@ -24,16 +24,16 @@ namespace BusinessLogic
             _dataApi.CreateBalls(count, boardWidth, boardHeight);
         }
 
-        public override IEnumerable<IBall> GetBalls()
+        public override IEnumerable<IBallStatus> GetBallsStatus()
         {
-            return _dataApi.GetBalls();
+            return _dataApi.GetBalls().Select(b => new BallStatus(b));
         }
 
         public override void StartSimulation()
         {
             if (_timer != null) return;
 
-            _timer = new System.Timers.Timer(30);
+            _timer = new System.Timers.Timer(16);
 
             _timer.Elapsed += MoveBalls;
 
@@ -56,41 +56,47 @@ namespace BusinessLogic
             int width = _dataApi.BoardWidth;
             int height = _dataApi.BoardHeight;
 
-            foreach (var ball in _dataApi.GetBalls())
+            lock (_dataApi)
             {
-                double newX = ball.X + ball.Velocity.X;
-                double newY = ball.Y + ball.Velocity.Y;
-
-                double currentVx = ball.Velocity.X;
-                double currentVy = ball.Velocity.Y;
-
-                if (newX <= ball.Radius)
+                foreach (var ball in _dataApi.GetBalls())
                 {
-                    newX = ball.Radius;
-                    currentVx = -currentVx;
-                }
-                else if (newX >= width - ball.Radius)
-                {
-                    newX = width - ball.Radius;
-                    currentVx = -currentVx;
-                }
+                    double newX = ball.X + ball.Velocity.X;
+                    double newY = ball.Y + ball.Velocity.Y;
 
-                if (newY <= ball.Radius)
-                {
-                    newY = ball.Radius;
-                    currentVy = -currentVy;
-                }
-                else if (newY >= height - ball.Radius)
-                {
-                    newY = height - ball.Radius;
-                    currentVy = -currentVy;
-                }
+                    double currentVx = ball.Velocity.X;
+                    double currentVy = ball.Velocity.Y;
 
-                ball.X = newX;
-                ball.Y = newY;
+                    if (newX <= ball.Radius)
+                    {
+                        newX = ball.Radius;
+                        currentVx = -currentVx;
+                    }
+                    else if (newX >= width - ball.Radius)
+                    {
+                        newX = width - ball.Radius;
+                        currentVx = -currentVx;
+                    }
 
-                ball.Velocity = new Vector2D(currentVx,currentVy);
+                    if (newY <= ball.Radius)
+                    {
+                        newY = ball.Radius;
+                        currentVy = -currentVy;
+                    }
+                    else if (newY >= height - ball.Radius)
+                    {
+                        newY = height - ball.Radius;
+                        currentVy = -currentVy;
+                    }
+
+                    ball.X = newX;
+                    ball.Y = newY;
+                    ball.Velocity = new Vector2D(currentVx, currentVy);
+                }
             }
+
+            var snapshot = GetBallsStatus().ToList();
+
+            SimulationUpdated?.Invoke(this, snapshot);
         }
     }
 }

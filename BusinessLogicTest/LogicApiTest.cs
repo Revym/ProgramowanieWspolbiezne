@@ -1,46 +1,48 @@
 using BusinessLogic;
 using Data;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace BusinessLogicTest;
-
-[TestClass]
-public class LogicApiTest
+namespace BusinessLogicTest
 {
-    [TestMethod]
-    public void CreateBalls_ShouldCreateCorrectNumberOfBalls()
+    [TestClass]
+    public class LogicApiTest
     {
-        DataAbstractApi fakeData = new FakeDataApi();
-        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
-
-        logicApi.CreateBalls(3, 500, 500);
-        var balls = logicApi.GetBalls();
-
-        Assert.AreEqual(3, balls.Count());
-    }
-
-    [TestMethod]
-    public async Task StartSimulation_ShouldMoveBalls()
-    {
-        DataAbstractApi fakeData = new FakeDataApi();
-        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
-
-        logicApi.CreateBalls(1, 500, 500);
-        var balls = logicApi.GetBalls().ToList();
-
-        int positionChangesCount = 0;
-
-        balls[0].PropertyChanged += (sender, args) =>
+        [TestMethod]
+        public void CreateBalls_ShouldCreateCorrectNumberOfBalls()
         {
-            if (args.PropertyName == "X" || args.PropertyName == "Y")
+            DataAbstractApi fakeData = new FakeDataApi();
+            LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
+
+            logicApi.CreateBalls(3, 500, 500);
+            var balls = logicApi.GetBallsStatus();
+
+            Assert.AreEqual(3, balls.Count());
+        }
+
+        [TestMethod]
+        public async Task StartSimulation_ShouldTriggerSimulationUpdatedEvent()
+        {
+            DataAbstractApi fakeData = new FakeDataApi();
+            LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
+
+            logicApi.CreateBalls(1, 500, 500);
+
+            int updatesCount = 0;
+
+            logicApi.SimulationUpdated += (sender, args) =>
             {
-                positionChangesCount++;
-            }
-        };
+                updatesCount++;
+            };
 
-        logicApi.StartSimulation();
-        await Task.Delay(100);
-        logicApi.StopSimulation();
+            logicApi.StartSimulation();
 
-        Assert.IsGreaterThan(0, positionChangesCount);
+            await Task.Delay(150);
+
+            logicApi.StopSimulation();
+
+            Assert.IsTrue(updatesCount > 0, "Symulacja nie wypchnęła żadnych aktualizacji (SimulationUpdated).");
+        }
     }
 }

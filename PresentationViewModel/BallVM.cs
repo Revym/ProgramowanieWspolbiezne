@@ -1,58 +1,63 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Data;
 
 namespace PresentationViewModel
 {
     public class BallVM : INotifyPropertyChanged
     {
-        private readonly IBall _ball;
+        private double _x;
+        private double _y;
+        private double _radius;
+        private double _scale = 1.0;
 
-        public BallVM(IBall ball)
+        public BallVM() { }
+
+        public double X
         {
-            _ball = ball;
-
-            _ball.PropertyChanged += Ball_PropertyChanged;
+            get => _x;
+            set { _x = value; OnPropertyChanged(); OnPropertyChanged(nameof(Left)); }
         }
 
-        private void Ball_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public double Y
         {
-            if (e.PropertyName == "X")
+            get => _y;
+            set { _y = value; OnPropertyChanged(); OnPropertyChanged(nameof(Top)); }
+        }
+
+        public double Radius
+        {
+            get => _radius;
+            set
             {
+                _radius = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Diameter));
                 OnPropertyChanged(nameof(Left));
-            }
-            else if (e.PropertyName == "Y")
-            {
                 OnPropertyChanged(nameof(Top));
             }
         }
 
-        private double _scale = 1.0;
         public double Scale
         {
             get => _scale;
             set
             {
                 _scale = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(Left));
                 OnPropertyChanged(nameof(Top));
                 OnPropertyChanged(nameof(Diameter));
             }
         }
 
-        public double Left => (_ball.X - _ball.Radius) * Scale;
-        public double Top => (_ball.Y - _ball.Radius) * Scale;
-        public double Diameter => (_ball.Radius * 2) * Scale;
+        public double Left => (X - Radius) * Scale;
+        public double Top => (Y - Radius) * Scale;
+        public double Diameter => (Radius * 2) * Scale;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void Dispose()
-        {
-            _ball.PropertyChanged -= Ball_PropertyChanged;
         }
     }
 }
