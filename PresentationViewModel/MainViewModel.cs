@@ -12,6 +12,34 @@ namespace PresentationViewModel
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private const double LogicalWidth = 600;
+        private const double LogicalHeight = 400;
+
+        private double _actualWidth;
+        private double _actualHeight;
+
+        public double ActualWidth
+        {
+            get => _actualWidth;
+            set { _actualWidth = value; OnPropertyChanged(); OnPropertyChanged(nameof(Scale)); UpdateBallScaling(); }
+        }
+
+        public double ActualHeight
+        {
+            get => _actualHeight;
+            set { _actualHeight = value; OnPropertyChanged(); OnPropertyChanged(nameof(Scale)); UpdateBallScaling(); }
+        }
+
+        public double Scale => Math.Min(ActualWidth / LogicalWidth, ActualHeight / LogicalHeight);
+
+        private void UpdateBallScaling()
+        {
+            foreach (var ball in Balls)
+            {
+                ball.Scale = this.Scale;
+            }
+        }
+
         private readonly ModelAbstractApi _model;
 
         private string _ballsCountText = "5";
@@ -55,6 +83,7 @@ namespace PresentationViewModel
                 {
                     Balls.Add(new BallVM(ball));
                 }
+                UpdateBallScaling();
             }
         }
 

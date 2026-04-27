@@ -25,7 +25,12 @@
 
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Width="600" Height="400" Background="LightGray" ClipToBounds="True" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0"/>
+                    <Canvas Background="LightGray" 
+                ClipToBounds="True"
+                local:SizeObserver.Observe="True"
+                local:SizeObserver.ObservedWidth="{Binding ActualWidth, Mode=OneWayToSource}"
+                local:SizeObserver.ObservedHeight="{Binding ActualHeight, Mode=OneWayToSource}">
+                    </Canvas>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 

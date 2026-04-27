@@ -27,9 +27,22 @@ namespace PresentationViewModel
             }
         }
 
-        public double Left => _ball.X - _ball.Radius;
-        public double Top => _ball.Y - _ball.Radius;
-        public double Diameter => _ball.Radius * 2;
+        private double _scale = 1.0;
+        public double Scale
+        {
+            get => _scale;
+            set
+            {
+                _scale = value;
+                OnPropertyChanged(nameof(Left));
+                OnPropertyChanged(nameof(Top));
+                OnPropertyChanged(nameof(Diameter));
+            }
+        }
+
+        public double Left => (_ball.X - _ball.Radius) * Scale;
+        public double Top => (_ball.Y - _ball.Radius) * Scale;
+        public double Diameter => (_ball.Radius * 2) * Scale;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
