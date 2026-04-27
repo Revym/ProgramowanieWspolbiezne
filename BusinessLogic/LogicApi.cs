@@ -58,32 +58,38 @@ namespace BusinessLogic
 
             foreach (var ball in _dataApi.GetBalls())
             {
-                double moveX = (_random.NextDouble() * 6) - 3;
-                double moveY = (_random.NextDouble() * 6) - 3;
+                double newX = ball.X + ball.Velocity.X;
+                double newY = ball.Y + ball.Velocity.Y;
 
-                double newX = ball.X + moveX;
-                double newY = ball.Y + moveY;
+                double currentVx = ball.Velocity.X;
+                double currentVy = ball.Velocity.Y;
 
                 if (newX <= ball.Radius)
                 {
                     newX = ball.Radius;
+                    currentVx = -currentVx;
                 }
                 else if (newX >= width - ball.Radius)
                 {
                     newX = width - ball.Radius;
+                    currentVx = -currentVx;
                 }
 
                 if (newY <= ball.Radius)
                 {
                     newY = ball.Radius;
+                    currentVy = -currentVy;
                 }
                 else if (newY >= height - ball.Radius)
                 {
                     newY = height - ball.Radius;
+                    currentVy = -currentVy;
                 }
 
                 ball.X = newX;
                 ball.Y = newY;
+
+                ball.Velocity = new Vector2D(currentVx,currentVy);
             }
         }
     }

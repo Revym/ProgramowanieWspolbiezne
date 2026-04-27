@@ -11,14 +11,16 @@ namespace Data
         private double _x;
         private double _y;
         private readonly double _radius;
+        public Vector2D Velocity { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Ball(double x, double y, double radius)
+        public Ball(double x, double y, double radius, Vector2D velocity)
         {
             _x = x;
             _y = y;
             _radius = radius;
+            Velocity = velocity;
         }
 
         public double X
