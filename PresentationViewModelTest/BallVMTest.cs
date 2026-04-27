@@ -28,7 +28,12 @@ public class BallVMTest
     {
         IBall fakeBall = new FakeBall();
 
-        BallVM ballVm = new BallVM();
+        BallVM ballVm = new BallVM
+        {
+            X = fakeBall.X,
+            Y = fakeBall.Y,
+            Radius = fakeBall.Radius
+        };
 
         Assert.AreEqual(35, ballVm.Left);
         Assert.AreEqual(35, ballVm.Top);
