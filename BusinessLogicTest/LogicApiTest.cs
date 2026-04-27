@@ -1,4 +1,5 @@
 using BusinessLogic;
+using Data;
 
 namespace BusinessLogicTest;
 
@@ -8,7 +9,8 @@ public class LogicApiTest
     [TestMethod]
     public void CreateBalls_ShouldCreateCorrectNumberOfBalls()
     {
-        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi();
+        DataAbstractApi fakeData = new FakeDataApi();
+        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
 
         logicApi.CreateBalls(3, 500, 500);
         var balls = logicApi.GetBalls();
@@ -19,7 +21,9 @@ public class LogicApiTest
     [TestMethod]
     public async Task StartSimulation_ShouldMoveBalls()
     {
-        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi();
+        DataAbstractApi fakeData = new FakeDataApi();
+        LogicAbstractApi logicApi = LogicAbstractApi.CreateApi(fakeData);
+
         logicApi.CreateBalls(1, 500, 500);
         var balls = logicApi.GetBalls().ToList();
 
