@@ -8,7 +8,7 @@ public class BallTest
     [TestMethod]
     public void Ball_PropertyChanged_ShouldRaiseEventWhenXChanges()
     {
-        IBall ball = DataAbstractApi.CreateApi().GetBalls().FirstOrDefault() ?? new Ball(10, 10, 5);
+        IBall ball = DataAbstractApi.CreateApi().GetBalls().FirstOrDefault() ?? new Ball(10, 10, 5, new Vector2D(1,2));
         bool eventRaised = false;
 
         ball.PropertyChanged += (sender, e) =>
