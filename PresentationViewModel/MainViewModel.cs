@@ -13,8 +13,8 @@ namespace PresentationViewModel
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private const double LogicalWidth = 600;
-        private const double LogicalHeight = 400;
+        public double LogicalWidth => _model.BoardWidth;
+        public double LogicalHeight => _model.BoardHeight;
 
         private double _actualWidth;
         private double _actualHeight;
@@ -74,6 +74,7 @@ namespace PresentationViewModel
             StartCommand = new RelayCommand(Start);
             StopCommand = new RelayCommand(Stop);
         }
+
 
         private void UpdateBallsList(IEnumerable<IBallStatus> statuses)
         {

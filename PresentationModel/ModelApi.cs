@@ -10,6 +10,9 @@ namespace PresentationModel
 
         public override event EventHandler<IEnumerable<IBallStatus>>? ModelUpdated;
 
+        public override int BoardWidth => _logicApi.BoardWidth;
+        public override int BoardHeight => _logicApi.BoardHeight;
+
         public ModelApi()
         {
             _logicApi = LogicAbstractApi.CreateApi();

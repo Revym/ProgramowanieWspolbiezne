@@ -7,6 +7,9 @@ namespace BusinessLogic
 {
     public abstract class LogicAbstractApi
     {
+        public abstract int BoardWidth { get; }
+        public abstract int BoardHeight { get; }
+
         public abstract void CreateBalls(int count, int boardWidth, int boardHeight);
         public abstract IEnumerable<IBallStatus> GetBallsStatus();
 

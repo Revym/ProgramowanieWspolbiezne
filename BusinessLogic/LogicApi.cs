@@ -12,6 +12,9 @@ namespace BusinessLogic
         private System.Timers.Timer? _timer;
         private readonly Random _random = new Random();
 
+        public override int BoardWidth => _dataApi.BoardWidth;
+        public override int BoardHeight => _dataApi.BoardHeight;
+
         public override event EventHandler<IEnumerable<IBallStatus>>? SimulationUpdated;
 
         public LogicApi(DataAbstractApi dataApi)
