@@ -18,20 +18,26 @@ namespace Data
 
         public override void CreateBalls(int count, int boardWidth, int boardHeight)
         {
+            foreach (var ball in _balls)
+            {
+                if (ball is IDisposable disposableBall) disposableBall.Dispose();
+            }
+
             _balls.Clear();
             _boardWidth = boardWidth;
             _boardHeight = boardHeight;
 
-            double defaultRadius = 15.0;
-
-            double minX = defaultRadius;
-            double maxX = boardWidth - defaultRadius;
-
-            double minY = defaultRadius;
-            double maxY = boardHeight - defaultRadius;
-
             for (int i = 0; i < count; i++)
             {
+                double radius = 10.0 + (_random.NextDouble() * 10.0);
+                double mass = Math.PI * radius * radius;
+
+                double minX = radius;
+                double maxX = boardWidth - radius;
+
+                double minY = radius;
+                double maxY = boardHeight - radius;
+
                 double x = minX + (_random.NextDouble() * (maxX - minX));
                 double y = minY + (_random.NextDouble() * (maxY - minY));
 
@@ -43,7 +49,7 @@ namespace Data
 
                 Vector2D velocity = new Vector2D(vx, vy);
 
-                _balls.Add(new Ball(x, y, defaultRadius, velocity));
+                _balls.Add(new Ball(x, y, radius, velocity, mass));
             }
         }
 

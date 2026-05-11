@@ -10,7 +10,7 @@ namespace Data
         double X { get; set; }
         double Y { get; set; }
         double Radius { get; }
-
+        double Mass { get; }
         Vector2D Velocity { get; set; }
     }
 }
