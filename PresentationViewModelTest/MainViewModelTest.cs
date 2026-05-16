@@ -12,6 +12,7 @@ public class MainViewModelTest
         public double X { get; set; } = 50;
         public double Y { get; set; } = 50;
         public double Radius { get; set; } = 15;
+        public double Mass { get; set; } = 15;
     }
 
     internal class FakeModelApi : ModelAbstractApi

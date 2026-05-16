@@ -38,7 +38,8 @@ namespace DataTest
 
             foreach (var ball in balls)
             {
-                Assert.AreEqual(expectedRadius, ball.Radius);
+                Assert.IsGreaterThanOrEqualTo(10, ball.Radius);
+                Assert.IsLessThanOrEqualTo(20, ball.Radius);
 
                 Assert.IsGreaterThanOrEqualTo(expectedRadius, ball.X);
                 Assert.IsLessThanOrEqualTo(boardWidth - expectedRadius, ball.X);

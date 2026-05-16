@@ -8,6 +8,7 @@ public class FakeBall : IBall
     public double X { get; set; } = 50;
     public double Y { get; set; } = 50;
     public int Radius { get; set; } = 15;
+    public double Mass { get; set; } = 15;
     public Vector2D Velocity { get; set; } = new Vector2D(1,2);
 
     double IBall.Radius => Radius;
