@@ -19,6 +19,10 @@ namespace BusinessLogic
 
         public override event EventHandler<IEnumerable<IBallStatus>>? SimulationUpdated;
 
+        private CancellationTokenSource? _broadcastCts;
+        private Task? _broadcastTask;
+        private readonly int _fpsIntervalMs = 16; 
+
         public LogicApi(DataAbstractApi dataApi)
         {
             _dataApi = dataApi;
@@ -41,11 +45,45 @@ namespace BusinessLogic
 
         public override void StartSimulation()
         {
-            SimulationUpdated?.Invoke(this, GetBallsStatus().ToList());
+            //SimulationUpdated?.Invoke(this, GetBallsStatus().ToList());
+            _broadcastCts = new CancellationTokenSource();
+
+            _broadcastTask = Task.Run(async () =>
+            {
+                while (!_broadcastCts.Token.IsCancellationRequested)
+                {
+                    var ballsSnapshot = GetBallsStatus().ToList();
+                    SimulationUpdated?.Invoke(this, ballsSnapshot);
+
+                    try
+                    {
+                        await Task.Delay(_fpsIntervalMs, _broadcastCts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+
+                }
+            }, _broadcastCts.Token);
         }
 
         public override void StopSimulation()
         {
+            if (_broadcastCts != null)
+            {
+                _broadcastCts.Cancel();
+                try
+                {
+                    _broadcastTask?.Wait();
+                }
+                catch (AggregateException) { }
+
+                _broadcastCts.Dispose();
+                _broadcastCts = null;
+                _broadcastTask = null;
+            }
+            
             foreach (var ball in _dataApi.GetBalls())
             {
                 ball.PropertyChanged -= OnBallMoved;
@@ -57,7 +95,6 @@ namespace BusinessLogic
             if (sender is IBall ball && (e.PropertyName == "X" || e.PropertyName == "Y"))
             {
                 CheckCollisions(ball);
-                SimulationUpdated?.Invoke(this, GetBallsStatus().ToList());
             }
         }
 
