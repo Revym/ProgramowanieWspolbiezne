@@ -13,6 +13,7 @@ namespace BusinessLogicTest
         private double _y;
         public double Radius { get; } = 15.0;
         public Vector2D Velocity { get; set; } = new Vector2D(1, 1);
+        public double Mass { get; set; }
 
         public FakeBall(double x, double y)
         {

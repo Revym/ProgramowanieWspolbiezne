@@ -5,15 +5,29 @@ using System.Text;
 
 namespace BusinessLogic
 {
-    internal class TreeNode
+    internal class BallSnapshot
     {
         public IBall Ball { get; }
+        public double X { get; }
+        public double Y { get; }
+
+        public BallSnapshot (IBall ball)
+        {
+            Ball = ball;
+            X = ball.X;
+            Y = ball.Y;
+        }
+    }
+    
+    internal class TreeNode
+    {
+        public BallSnapshot Snapshot { get; }
         public TreeNode? Left { get; set; }
         public TreeNode? Right { get; set; }
 
-        public TreeNode(IBall ball)
+        public TreeNode(BallSnapshot snapshot)
         {
-            Ball = ball;
+            Snapshot = snapshot;
         }
     }
 
@@ -23,22 +37,23 @@ namespace BusinessLogic
 
         public void Build(IEnumerable<IBall> balls)
         {
-            _root = BuildRecursive(balls.ToList(), 0);
+            var snapshots = balls.Select(b => new BallSnapshot(b)).ToList();
+            _root = BuildRecursive(snapshots, 0);
         }
 
-        private TreeNode? BuildRecursive(List<IBall> balls, int depth)
+        private TreeNode? BuildRecursive(List<BallSnapshot> snapshots, int depth)
         {
-            if (balls.Count == 0) return null;
+            if (snapshots.Count == 0) return null;
 
             int axis = depth % 2;
 
-            balls.Sort((a, b) => axis == 0 ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
+            snapshots.Sort((a, b) => axis == 0 ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
 
-            int medianIndex = balls.Count / 2;
-            TreeNode node = new TreeNode(balls[medianIndex]);
+            int medianIndex = snapshots.Count / 2;
+            TreeNode node = new TreeNode(snapshots[medianIndex]);
 
-            node.Left = BuildRecursive(balls.GetRange(0, medianIndex), depth + 1);
-            node.Right = BuildRecursive(balls.GetRange(medianIndex + 1, balls.Count - (medianIndex + 1)), depth + 1);
+            node.Left = BuildRecursive(snapshots.GetRange(0, medianIndex), depth + 1);
+            node.Right = BuildRecursive(snapshots.GetRange(medianIndex + 1, snapshots.Count - (medianIndex + 1)), depth + 1);
 
             return node;
         }
@@ -54,18 +69,18 @@ namespace BusinessLogic
         {
             if (node == null) return;
 
-            if (node.Ball != target)
+            if (node.Snapshot.Ball != target)
             {
-                double dist = Math.Sqrt(Math.Pow(node.Ball.X - target.X, 2) + Math.Pow(node.Ball.Y - target.Y, 2));
+                double dist = Math.Sqrt(Math.Pow(node.Snapshot.X - target.X, 2) + Math.Pow(node.Snapshot.Y - target.Y, 2));
                 if (dist <= searchRadius)
                 {
-                    result.Add(node.Ball);
+                    result.Add(node.Snapshot.Ball);
                 }
             }
 
             int axis = depth % 2;
             double targetCoord = axis == 0 ? target.X : target.Y;
-            double nodeCoord = axis == 0 ? node.Ball.X : node.Ball.Y;
+            double nodeCoord = axis == 0 ? node.Snapshot.X : node.Snapshot.Y;
 
             if (targetCoord - searchRadius <= nodeCoord)
             {

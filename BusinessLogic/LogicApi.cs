@@ -155,23 +155,23 @@ namespace BusinessLogic
             int width = BoardWidth;
             int height = BoardHeight;
 
-            if (currentBall.X <= currentBall.Radius)
+            if (currentBall.X <= currentBall.Radius && currentBall.Velocity.X < 0)
             {
                 currentBall.X = currentBall.Radius;
                 currentBall.Velocity = new Vector2D(-currentBall.Velocity.X, currentBall.Velocity.Y);
             }
-            else if (currentBall.X >= width - currentBall.Radius)
+            else if (currentBall.X >= width - currentBall.Radius && currentBall.Velocity.X > 0)
             {
                 currentBall.X = width - currentBall.Radius;
                 currentBall.Velocity = new Vector2D(-currentBall.Velocity.X, currentBall.Velocity.Y);
             }
 
-            if (currentBall.Y <= currentBall.Radius)
+            if (currentBall.Y <= currentBall.Radius && currentBall.Velocity.Y < 0)
             {
                 currentBall.Y = currentBall.Radius;
                 currentBall.Velocity = new Vector2D(currentBall.Velocity.X, -currentBall.Velocity.Y);
             }
-            else if (currentBall.Y >= height - currentBall.Radius)
+            else if (currentBall.Y >= height - currentBall.Radius && currentBall.Velocity.Y > 0)
             {
                 currentBall.Y = height - currentBall.Radius;
                 currentBall.Velocity = new Vector2D(currentBall.Velocity.X, -currentBall.Velocity.Y);
