@@ -41,11 +41,11 @@ namespace Data
                 double x = minX + (_random.NextDouble() * (maxX - minX));
                 double y = minY + (_random.NextDouble() * (maxY - minY));
 
-                double vx = (_random.NextDouble() * 6.0) - 3.0;
-                double vy = (_random.NextDouble() * 6.0) - 3.0;
+                double vx = (_random.NextDouble() * 300.0) - 150.0;
+                double vy = (_random.NextDouble() * 300.0) - 150.0;
 
-                if (vx == 0) vx = 1.0;
-                if (vy == 0) vy = 1.0;
+                if (Math.Abs(vx) < 10) vx = vx < 0 ? -50 : 50;
+                if (Math.Abs(vy) < 10) vy = vy < 0 ? -50 : 50;
 
                 Vector2D velocity = new Vector2D(vx, vy);
 

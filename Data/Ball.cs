@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Data
 {
@@ -64,13 +67,25 @@ namespace Data
         {
             _movementTask = Task.Run(async () =>
             {
-                while (!_cancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    X += Velocity.X;
-                    Y += Velocity.Y;
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-                    await Task.Delay(16, _cancellationTokenSource.Token);
+
+                try
+                {
+                    while (!_cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        double deltaTime = stopwatch.Elapsed.TotalSeconds;
+                        stopwatch.Restart();
+                        
+                        X += Velocity.X * deltaTime;
+                        Y += Velocity.Y * deltaTime;
+
+                        await Task.Delay(16, _cancellationTokenSource.Token);
+                    }
                 }
+                catch (TaskCanceledException) { }
+
             }, _cancellationTokenSource.Token);
         }
 
