@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Data
 {
-    internal class DataApi : DataAbstractApi
+    internal class DataApi : DataAbstractApi, IDisposable
     {
         private readonly List<IBall> _balls = new List<IBall>();
 
@@ -15,6 +15,32 @@ namespace Data
 
         public override int BoardWidth => _boardWidth;
         public override int BoardHeight => _boardHeight;
+
+        private readonly DiagnosticLogger _logger;
+
+        public DataApi()
+        {
+            _logger = new DiagnosticLogger();
+        }
+
+        public override void LogData()
+        {
+            foreach (var ball in _balls)
+            {
+                _logger.LogBallState(ball);
+            }
+        }
+
+        public void Dispose()
+        {
+            _logger.Dispose();
+
+            foreach (var ball in _balls)
+            {
+                if (ball is IDisposable disposableBall)
+                    disposableBall.Dispose();
+            }
+        }
 
         public override void CreateBalls(int count, int boardWidth, int boardHeight)
         {
@@ -57,5 +83,7 @@ namespace Data
         {
             return _balls;
         }
+
+
     }
 }

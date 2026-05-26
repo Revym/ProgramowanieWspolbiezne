@@ -16,5 +16,7 @@ namespace Data
         {
             return new DataApi();
         }
+
+        public abstract void LogData();
     }
 }

@@ -21,7 +21,10 @@ namespace BusinessLogic
 
         private CancellationTokenSource? _broadcastCts;
         private Task? _broadcastTask;
-        private readonly int _fpsIntervalMs = 16; 
+        private readonly int _fpsIntervalMs = 16;
+
+        private Task? _loggingTask;
+        private CancellationTokenSource? _loggingCts;
 
         public LogicApi(DataAbstractApi dataApi)
         {
@@ -45,10 +48,10 @@ namespace BusinessLogic
 
         public override void StartSimulation()
         {
-            //SimulationUpdated?.Invoke(this, GetBallsStatus().ToList());
             _broadcastCts = new CancellationTokenSource();
 
             _broadcastTask = Task.Run(async () =>
+
             {
                 while (!_broadcastCts.Token.IsCancellationRequested)
                 {
@@ -64,8 +67,27 @@ namespace BusinessLogic
                         break;
                     }
 
+
+
                 }
             }, _broadcastCts.Token);
+
+            SimulationUpdated?.Invoke(this, GetBallsStatus().ToList());
+
+            _loggingCts = new CancellationTokenSource();
+            _loggingTask = Task.Run(async () =>
+            {
+                try
+                {
+                    while (!_loggingCts.Token.IsCancellationRequested)
+                    {
+                        _dataApi.LogData();
+
+                        await Task.Delay(1000, _loggingCts.Token);
+                    }
+                }
+                catch (TaskCanceledException) {  }
+            });
         }
 
         public override void StopSimulation()
@@ -88,6 +110,10 @@ namespace BusinessLogic
             {
                 ball.PropertyChanged -= OnBallMoved;
             }
+
+            _loggingCts?.Cancel();
+            _loggingTask?.Wait();
+            _loggingCts?.Dispose();
         }
 
         private void OnBallMoved(object? sender, PropertyChangedEventArgs e)
