@@ -15,22 +15,35 @@ namespace BusinessLogicTest
         public Vector2D Velocity { get; set; } = new Vector2D(1, 1);
         public double Mass { get; set; }
 
-        public FakeBall(double x, double y)
+        public FakeBall(double x, double y, double radius, double mass, Vector2D velocity)
         {
             _x = x;
             _y = y;
+            Radius = radius;
+            Mass = mass;
+            Velocity = velocity;
         }
 
         public double X
         {
             get => _x;
-            set { _x = value; OnPropertyChanged(); }
+            set { _x = value; OnPropertyChanged("X"); }
         }
 
         public double Y
         {
             get => _y;
-            set { _y = value; OnPropertyChanged(); }
+            set { _y = value; OnPropertyChanged("Y"); }
+        }
+
+        public void Move(double newX, double newY)
+        {
+            _x = newX;
+            _y = newY;
+            OnPropertyChanged("Position");
+            OnPropertyChanged("X");
+            OnPropertyChanged("Y");
+
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
