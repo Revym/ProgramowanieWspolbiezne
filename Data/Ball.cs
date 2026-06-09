@@ -16,9 +16,30 @@ namespace Data
         private readonly double _radius;
         private readonly double _mass;
 
-        private Task? _movementTask;
+        private Timer? _movementTimer;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
         private CancellationTokenSource _cancellationTokenSource;
-        public Vector2D Velocity { get; set; }
+
+        private Vector2D _velocity;
+        private readonly object _velocityLock = new object();
+
+        public Vector2D Velocity
+        {
+            get
+            {
+                lock (_velocityLock)
+                {
+                    return _velocity;
+                }
+            }
+            set
+            {
+                lock (_velocityLock)
+                {
+                    _velocity = value;
+                }
+            }
+        }
         public double Mass => _mass;
         public double Radius => _radius;
 
@@ -29,7 +50,7 @@ namespace Data
             _x = x;
             _y = y;
             _radius = radius;
-            Velocity = velocity;
+            _velocity = velocity;
             _mass = mass;
 
             _cancellationTokenSource = new CancellationTokenSource();
@@ -65,28 +86,21 @@ namespace Data
 
         private void StartMoving()
         {
-            _movementTask = Task.Run(async () =>
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
+            _stopwatch.Start();
+            _movementTimer = new Timer(OnTimerTick, null, 0, 16);
+        }
 
+        private void OnTimerTick(object? state)
+        {
+            if (_cancellationTokenSource.IsCancellationRequested) return;
 
-                try
-                {
-                    while (!_cancellationTokenSource.Token.IsCancellationRequested)
-                    {
-                        double deltaTime = stopwatch.Elapsed.TotalSeconds;
-                        stopwatch.Restart();
-                        
-                        X += Velocity.X * deltaTime;
-                        Y += Velocity.Y * deltaTime;
+            double deltaTime = _stopwatch.Elapsed.TotalSeconds;
+            _stopwatch.Restart();
 
-                        await Task.Delay(16, _cancellationTokenSource.Token);
-                    }
-                }
-                catch (TaskCanceledException) { }
+            Vector2D currentVelocity = this.Velocity;
 
-            }, _cancellationTokenSource.Token);
+            X += currentVelocity.X * deltaTime;
+            Y += currentVelocity.Y * deltaTime;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -97,7 +111,7 @@ namespace Data
         public void Dispose()
         {
             _cancellationTokenSource.Cancel();
-            _movementTask?.Wait();
+            _movementTimer?.Dispose();
             _cancellationTokenSource.Dispose();
         }
     }
